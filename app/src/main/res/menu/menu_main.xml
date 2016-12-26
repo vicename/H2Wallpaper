@@ -17,4 +17,10 @@
         android:orderInCategory="100"
         android:title="保存图片"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_set_wallpaper"
+        android:orderInCategory="100"
+        android:title="设置壁纸"
+        app:showAsAction="never" />
 </menu>

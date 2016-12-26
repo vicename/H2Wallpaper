@@ -1,5 +1,6 @@
 package com.dc.hwallpaper;
 
+import android.app.WallpaperManager;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
@@ -19,6 +20,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.dc.hwallpaper.base.BaseActivity;
 import com.dc.hwallpaper.handler.MainActivityHandler;
@@ -198,7 +200,7 @@ public class MainActivity extends BaseActivity {
         mFLayoutIconBox.setBackgroundColor(mCurrentColor);
     }
 
-    private void CompositeBitmaps(View pic, View shadow) {
+    private Bitmap CompositeBitmaps(View pic, View shadow) {
         Bitmap bitmapPic = ImageUtil.getBitmapFromView(pic);
         Bitmap bitmapShadow = ImageUtil.getBitmapFromView(shadow);
         Bitmap newBitmap = Bitmap.createBitmap(1080, 1920, Bitmap.Config.ARGB_8888);
@@ -213,10 +215,30 @@ public class MainActivity extends BaseActivity {
         canvas.restore();//存储
         bitmapPic.recycle();
         bitmapShadow.recycle();
+        return newBitmap;
+    }
+
+    private void savePic(Bitmap bitmap) {
         String filePath = FileUtils.getFolderPathDC("test");
         String picName = FileUtils.createFileName("test", ".jpg");
-        boolean isOk = ImageUtil.savePic(MainActivity.this, newBitmap, filePath + picName, picName);
+        boolean isOk = ImageUtil.savePic(MainActivity.this, bitmap, filePath + picName, picName);
         Logger.i(1, "isSaveOk:" + isOk);
+
+    }
+
+    private void setBitmapWallpaper(Bitmap bitmap) {
+        try {
+            WallpaperManager instance = WallpaperManager.getInstance(MainActivity.this);
+            int desiredMinimumWidth = getWindowManager().getDefaultDisplay().getWidth();
+            int desiredMinimumHeight = getWindowManager().getDefaultDisplay().getHeight();
+            instance.suggestDesiredDimensions(desiredMinimumWidth, desiredMinimumHeight);
+            instance.setBitmap(bitmap);
+            Toast.makeText(MainActivity.this, "壁纸设置成功", Toast.LENGTH_SHORT).show();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
     }
 
     @Override
@@ -246,7 +268,11 @@ public class MainActivity extends BaseActivity {
                 item.setTitle("显示阴影");
             }
         } else if (id == R.id.action_save) {
-            CompositeBitmaps(mPicBox, mIvShadow);
+            Bitmap bitmap = CompositeBitmaps(mPicBox, mIvShadow);
+            savePic(bitmap);
+        } else if (id == R.id.action_set_wallpaper) {
+            Bitmap bitmap = CompositeBitmaps(mPicBox, mIvShadow);
+            setBitmapWallpaper(bitmap);
         }
         return super.onOptionsItemSelected(item);
     }
