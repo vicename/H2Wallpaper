@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">H Wallpaper</string>
+    <string name="title_activity_settings">SettingsActivity</string>
+    <string name="action_settings">设置</string>
+</resources>
